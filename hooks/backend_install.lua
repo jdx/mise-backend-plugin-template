@@ -44,10 +44,9 @@ function PLUGIN:BackendInstall(ctx)
 
     -- Download the tool
     local temp_file = install_path .. "/" .. tool .. ".tar.gz"
-    local resp, err = http.download({
-        url = download_url,
-        output = temp_file
-    })
+    local resp, err = http.download_file({
+        url = download_url
+    }, temp_file)
 
     if err then
         error("Failed to download " .. tool .. "@" .. version .. ": " .. err)
