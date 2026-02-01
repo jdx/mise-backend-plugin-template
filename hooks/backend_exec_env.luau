@@ -2,16 +2,16 @@
 --- Documentation: https://mise.jdx.dev/backend-plugin-development.html#backendexecenv
 --- @param ctx {install_path: string, tool: string, version: string} Context
 --- @return {env_vars: table[]} Table containing list of environment variable definitions
-function PLUGIN:BackendExecEnv(ctx)
-    local install_path = ctx.install_path
-    local tool = ctx.tool
-    local version = ctx.version
+function PLUGIN:BackendExecEnv(ctx): { env_vars: { { key: string, value: string } } }
+    local install_path: string = ctx.install_path
+    local _tool: string = ctx.tool
+    local _version: string = ctx.version
 
     -- Basic PATH setup (most common case)
     local file = require("file")
     local bin_path = file.join_path(install_path, "bin")
 
-    local env_vars = {
+    local env_vars: { { key: string, value: string } } = {
         -- Add tool's bin directory to PATH
         { key = "PATH", value = bin_path },
     }
@@ -20,19 +20,19 @@ function PLUGIN:BackendExecEnv(ctx)
     --[[
     -- Add tool-specific home directory
     table.insert(env_vars, {
-        key = tool:upper() .. "_HOME",
+        key = `{tool:upper()}_HOME`,
         value = install_path
     })
 
     -- Add version environment variable
     table.insert(env_vars, {
-        key = tool:upper() .. "_VERSION",
+        key = `{tool:upper()}_VERSION`,
         value = version
     })
 
     -- Add configuration directory
     table.insert(env_vars, {
-        key = tool:upper() .. "_CONFIG",
+        key = `{tool:upper()}_CONFIG`,
         value = file.join_path(install_path, "config")
     })
     --]]
