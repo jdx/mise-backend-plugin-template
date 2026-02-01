@@ -7,22 +7,22 @@ local file = require("file") :: Types.FileModule
 --- Sets up environment variables for a tool
 --- Documentation: https://mise.jdx.dev/dev-tools/backends/vfox.html
 function plugin:BackendExecEnv(
-	ctx: { install_path: string, tool: string, version: string }
+    ctx: { install_path: string, tool: string, version: string }
 ): { env_vars: { Types.EnvKeyResult } }
-	local install_path: string = ctx.install_path
-	local _tool: string = ctx.tool
-	local _version: string = ctx.version
+    local install_path: string = ctx.install_path
+    local _tool: string = ctx.tool
+    local _version: string = ctx.version
 
-	-- Basic PATH setup (most common case)
-	local bin_path = file.join_path(install_path, "bin")
+    -- Basic PATH setup (most common case)
+    local bin_path = file.join_path(install_path, "bin")
 
-	local env_vars: { Types.EnvKeyResult } = {
-		-- Add tool's bin directory to PATH
-		{ key = "PATH", value = bin_path },
-	}
+    local env_vars: { Types.EnvKeyResult } = {
+        -- Add tool's bin directory to PATH
+        { key = "PATH", value = bin_path },
+    }
 
-	-- Example: Tool-specific environment variables
-	--[[
+    -- Example: Tool-specific environment variables
+    --[[
 	-- Add tool-specific home directory
 	table.insert(env_vars, {
 		key = `{_tool:upper()}_HOME`,
@@ -42,8 +42,8 @@ function plugin:BackendExecEnv(
 	})
 	--]]
 
-	-- Example: Backend-specific paths (like node_modules for npm)
-	--[[
+    -- Example: Backend-specific paths (like node_modules for npm)
+    --[[
 	-- For npm-like backends that install to subdirectories
 	local modules_bin = file.join_path(install_path, "node_modules", ".bin")
 	table.insert(env_vars, {key = "PATH", value = modules_bin})
@@ -57,8 +57,8 @@ function plugin:BackendExecEnv(
 	table.insert(env_vars, {key = "PATH", value = cargo_bin})
 	--]]
 
-	-- Example: Library paths for compiled tools
-	--[[
+    -- Example: Library paths for compiled tools
+    --[[
 	local runtime = RUNTIME :: Types.RuntimeType
 	local lib_path = file.join_path(install_path, "lib")
 	local lib64_path = file.join_path(install_path, "lib64")
@@ -71,20 +71,20 @@ function plugin:BackendExecEnv(
 	end
 	--]]
 
-	-- Example: Include paths for development tools
-	--[[
+    -- Example: Include paths for development tools
+    --[[
 	local include_path = file.join_path(install_path, "include")
 	table.insert(env_vars, {key = "C_INCLUDE_PATH", value = include_path})
 	table.insert(env_vars, {key = "CPLUS_INCLUDE_PATH", value = include_path})
 	--]]
 
-	-- Example: Manual pages path
-	--[[
+    -- Example: Manual pages path
+    --[[
 	local man_path = file.join_path(install_path, "share", "man")
 	table.insert(env_vars, {key = "MANPATH", value = man_path})
 	--]]
 
-	return {
-		env_vars = env_vars,
-	}
+    return {
+        env_vars = env_vars,
+    }
 end
