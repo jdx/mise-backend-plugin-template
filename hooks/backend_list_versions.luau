@@ -8,40 +8,40 @@ local json = require("json") :: Types.JsonModule
 --- Lists available versions for a tool in this backend
 --- Documentation: https://mise.jdx.dev/dev-tools/backends/vfox.html
 function plugin:BackendListVersions(ctx: { tool: string }): { versions: { string } }
-    local tool: string = ctx.tool
+	local tool: string = ctx.tool
 
-    -- Validate tool name
-    if not tool or tool == "" then
-        error("Tool name cannot be empty")
-    end
+	-- Validate tool name
+	if not tool or tool == "" then
+		error("Tool name cannot be empty")
+	end
 
-    -- Example implementations (choose/modify based on your backend):
+	-- Example implementations (choose/modify based on your backend):
 
-    -- Example 1: API-based version listing (like npm, pip, cargo)
-    -- Replace with your backend's API endpoint
-    local api_url = `https://api.<BACKEND>.org/packages/{tool}/versions`
+	-- Example 1: API-based version listing (like npm, pip, cargo)
+	-- Replace with your backend's API endpoint
+	local api_url = `https://api.<BACKEND>.org/packages/{tool}/versions`
 
-    local resp = http.get({
-        url = api_url,
-        -- headers = { ["Authorization"] = `Bearer {token}` } -- if needed
-    })
+	local resp = http.get({
+		url = api_url,
+		-- headers = { ["Authorization"] = `Bearer {token}` } -- if needed
+	})
 
-    if resp.status_code ~= 200 then
-        error(`API returned status {resp.status_code} for {tool}`)
-    end
+	if resp.status_code ~= 200 then
+		error(`API returned status {resp.status_code} for {tool}`)
+	end
 
-    local data = json.decode(resp.body :: string)
-    local versions: { string } = {}
+	local data = json.decode(resp.body :: string)
+	local versions: { string } = {}
 
-    -- Parse versions from API response (adjust based on your API structure)
-    if data.versions then
-        for _, version in data.versions do
-            table.insert(versions, version)
-        end
-    end
+	-- Parse versions from API response (adjust based on your API structure)
+	if data.versions then
+		for _, version in data.versions do
+			table.insert(versions, version)
+		end
+	end
 
-    -- Example 2: Command-line based version listing
-    --[[
+	-- Example 2: Command-line based version listing
+	--[[
 	local cmd = require("cmd") :: Types.CmdModule
 
 	-- Replace with your backend's command to list versions
@@ -59,8 +59,8 @@ function plugin:BackendListVersions(ctx: { tool: string }): { versions: { string
 	end
 	--]]
 
-    -- Example 3: Registry file parsing
-    --[[
+	-- Example 3: Registry file parsing
+	--[[
 	local file = require("file") :: Types.FileModule
 
 	-- Replace with path to your backend's registry or manifest
@@ -75,9 +75,9 @@ function plugin:BackendListVersions(ctx: { tool: string }): { versions: { string
 	local versions = data.versions or {}
 	--]]
 
-    if #versions == 0 then
-        error(`No versions found for {tool}`)
-    end
+	if #versions == 0 then
+		error(`No versions found for {tool}`)
+	end
 
-    return { versions = versions }
+	return { versions = versions }
 end
