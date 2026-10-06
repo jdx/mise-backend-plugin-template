@@ -270,7 +270,7 @@ function PLUGIN:BackendInstall(ctx)
     
     local http = require("http")
     local temp_file = ctx.install_path .. "/tool.tar.gz"
-    http.download({url = url, output = temp_file})
+    http.download_file({url = url}, temp_file)
     
     local cmd = require("cmd")
     cmd.exec("cd " .. ctx.install_path .. " && tar -xzf tool.tar.gz")
