@@ -3,27 +3,30 @@
 -- Documentation: https://mise.jdx.dev/backend-plugin-development.html
 
 PLUGIN = { -- luacheck: ignore
-    -- Required: Plugin name (will be the backend name users reference)
+    -- Required: Plugin metadata name
     name = "<BACKEND>",
 
-    -- Required: Plugin version (not the tool versions)
+    -- Required: Plugin metadata version
     version = "1.0.0",
 
-    -- Required: Brief description of the backend and tools it manages
+    -- Optional: Plugin description
     description = "A mise backend plugin for <BACKEND> tools",
 
-    -- Required: Plugin author/maintainer
+    -- Optional: Plugin author
     author = "<GITHUB_USER>",
 
-    -- Optional: Plugin homepage/repository URL
-    homepage = "https://github.com/<GITHUB_USER>/<BACKEND>",
-
-    -- Optional: Plugin license
+    -- Optional: License name
     license = "MIT",
 
-    -- Optional: Important notes for users
-    notes = {
-        -- "Requires <BACKEND> to be installed on your system",
-        -- "This plugin manages tools from the <BACKEND> ecosystem"
-    },
+    -- Optional: Plugin homepage
+    homepage = "https://github.com/<GITHUB_USER>/<BACKEND>",
+
+    -- Optional: Legacy version files this plugin can parse
+    -- legacyFilenames = {
+    --     ".<BACKEND>-version",
+    --     ".<BACKEND>rc",
+    -- },
+
+    -- Optional: configured mise tools to add to install-hook PATH
+    -- depends = { "node" },
 }

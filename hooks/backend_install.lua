@@ -1,11 +1,13 @@
 --- Installs a specific version of a tool
 --- Documentation: https://mise.jdx.dev/backend-plugin-development.html#backendinstall
---- @param ctx {tool: string, version: string, install_path: string} Context
+--- @param ctx BackendInstallCtx Context for the requested backend tool installation
 --- @return table Empty table on success
 function PLUGIN:BackendInstall(ctx)
     local tool = ctx.tool
     local version = ctx.version
     local install_path = ctx.install_path
+    local download_path = ctx.download_path
+    -- local options = ctx.options -- Plugin options from mise.toml
 
     -- Validate inputs
     if not tool or tool == "" then
@@ -16,6 +18,9 @@ function PLUGIN:BackendInstall(ctx)
     end
     if not install_path or install_path == "" then
         error("Install path cannot be empty")
+    end
+    if not download_path or download_path == "" then
+        error("Download path cannot be empty")
     end
 
     -- Create installation directory
@@ -36,6 +41,7 @@ function PLUGIN:BackendInstall(ctx)
     --[[
     local http = require("http")
     local file = require("file")
+    local archiver = require("archiver")
 
     -- Construct download URL (adjust based on your backend's URL pattern)
     local platform = RUNTIME.osType:lower()
@@ -43,18 +49,13 @@ function PLUGIN:BackendInstall(ctx)
     local download_url = "https://releases.<BACKEND>.org/" .. tool .. "/" .. version .. "/" .. tool .. "-" .. platform .. "-" .. arch .. ".tar.gz"
 
     -- Download the tool
-    local temp_file = install_path .. "/" .. tool .. ".tar.gz"
-    local ok, err = http.try_download_file({
+    local temp_file = file.join_path(download_path, tool .. ".tar.gz")
+    http.download_file({
         url = download_url
     }, temp_file)
 
-    if not ok then
-        error("Failed to download " .. tool .. "@" .. version .. ": " .. err)
-    end
-
     -- Extract the archive
-    cmd.exec("cd " .. install_path .. " && tar -xzf " .. temp_file)
-    cmd.exec("rm " .. temp_file)
+    archiver.decompress(temp_file, install_path)
 
     -- Set executable permissions
     cmd.exec("chmod +x " .. install_path .. "/bin/" .. tool)

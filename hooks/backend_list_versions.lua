@@ -1,9 +1,10 @@
 --- Lists available versions for a tool in this backend
 --- Documentation: https://mise.jdx.dev/backend-plugin-development.html#backendlistversions
---- @param ctx {tool: string} Context (tool = the tool name requested)
+--- @param ctx BackendListVersionsCtx Context for the requested backend tool
 --- @return {versions: string[]} Table containing list of available versions
 function PLUGIN:BackendListVersions(ctx)
     local tool = ctx.tool
+    -- local options = ctx.options -- Plugin options from mise.toml
 
     -- Validate tool name
     if not tool or tool == "" then
@@ -19,14 +20,10 @@ function PLUGIN:BackendListVersions(ctx)
     -- Replace with your backend's API endpoint
     local api_url = "https://api.<BACKEND>.org/packages/" .. tool .. "/versions"
 
-    local resp, err = http.get({
+    local resp = http.get({
         url = api_url,
         -- headers = { ["Authorization"] = "Bearer " .. token } -- if needed
     })
-
-    if err then
-        error("Failed to fetch versions for " .. tool .. ": " .. err)
-    end
 
     if resp.status_code ~= 200 then
         error("API returned status " .. resp.status_code .. " for " .. tool)

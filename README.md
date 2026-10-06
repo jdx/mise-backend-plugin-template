@@ -38,7 +38,7 @@ Search and replace these placeholders throughout the project:
 - `<TEST_TOOL>` → a real tool name your backend can install (for testing)
 
 Files to update:
-- `metadata.lua` - Update name, description, author, homepage
+- `metadata.lua` - Update name, version, description, author, license, homepage, and optional metadata
 - `hooks/*.lua` - Replace placeholders and implement your backend logic
 - `mise-tasks/test` - Update test tool name and commands
 - `README.md` - Update this file with your backend's information
@@ -53,6 +53,7 @@ Lists available versions for a tool in your backend.
 ```lua
 function PLUGIN:BackendListVersions(ctx)
     local tool = ctx.tool
+    -- local options = ctx.options
     -- Your logic to fetch versions for the tool
     -- Return: {versions = {"1.0.0", "1.1.0", "2.0.0"}}
 end
@@ -71,6 +72,8 @@ function PLUGIN:BackendInstall(ctx)
     local tool = ctx.tool
     local version = ctx.version  
     local install_path = ctx.install_path
+    local download_path = ctx.download_path
+    -- local options = ctx.options
     -- Your logic to install the tool
     -- Return: {}
 end
@@ -87,6 +90,7 @@ Sets up environment variables for a tool.
 ```lua
 function PLUGIN:BackendExecEnv(ctx)
     local install_path = ctx.install_path
+    -- local options = ctx.options
     -- Your logic to set up environment
     -- Return: {env_vars = {{key = "PATH", value = install_path .. "/bin"}}}
 end
@@ -119,11 +123,11 @@ Provide meaningful error messages:
 ```lua
 function PLUGIN:BackendListVersions(ctx)
     local tool = ctx.tool
-    
+
     if not tool or tool == "" then
         error("Tool name cannot be empty")
     end
-    
+
     -- ... your implementation ...
     
     if #versions == 0 then
@@ -269,12 +273,12 @@ function PLUGIN:BackendInstall(ctx)
                 "/" .. ctx.tool .. "-" .. platform .. "-" .. arch .. ".tar.gz"
     
     local http = require("http")
-    local temp_file = ctx.install_path .. "/tool.tar.gz"
+    local file = require("file")
+    local archiver = require("archiver")
+    local temp_file = file.join_path(ctx.download_path, "tool.tar.gz")
     http.download_file({url = url}, temp_file)
-    
-    local cmd = require("cmd")
-    cmd.exec("cd " .. ctx.install_path .. " && tar -xzf tool.tar.gz")
-    cmd.exec("rm " .. temp_file)
+
+    archiver.decompress(temp_file, ctx.install_path)
     return {}
 end
 ```
@@ -290,13 +294,24 @@ end
 | Variable | Type | Description | Example |
 |----------|------|-------------|---------|
 | `ctx.tool` | string | Tool name | `"prettier"` |
+| `ctx.options` | table | Plugin options from `mise.toml` | `{}` |
 
-### BackendInstall and BackendExecEnv Context  
+### BackendInstall Context
 | Variable | Type | Description | Example |
 |----------|------|-------------|---------|
 | `ctx.tool` | string | Tool name | `"prettier"` |
 | `ctx.version` | string | Tool version | `"3.0.0"` |
 | `ctx.install_path` | string | Installation directory | `"/home/user/.local/share/mise/installs/npm/prettier/3.0.0"` |
+| `ctx.download_path` | string | Download cache directory | `"/home/user/.local/share/mise/downloads/npm/prettier/3.0.0"` |
+| `ctx.options` | table | Plugin options from `mise.toml` | `{}` |
+
+### BackendExecEnv Context
+| Variable | Type | Description | Example |
+|----------|------|-------------|---------|
+| `ctx.tool` | string | Tool name | `"prettier"` |
+| `ctx.version` | string | Tool version | `"3.0.0"` |
+| `ctx.install_path` | string | Installation directory | `"/home/user/.local/share/mise/installs/npm/prettier/3.0.0"` |
+| `ctx.options` | table | Plugin options from `mise.toml` | `{}` |
 
 ### Available Lua Modules
 
@@ -306,6 +321,7 @@ Backend plugins have access to these built-in modules:
 - `http` - HTTP client for downloads and API calls  
 - `json` - JSON parsing and encoding
 - `file` - File system operations
+- `archiver` - Archive extraction
 
 ## Publishing
 
@@ -313,15 +329,12 @@ Backend plugins have access to these built-in modules:
 2. Create a GitHub repository for your plugin
 3. Push your code
 4. Test with: `mise plugin install mybackend https://github.com/user/mise-mybackend`
-5. (Optional) Request to transfer to [mise-plugins](https://github.com/mise-plugins) organization
-6. Add to the [mise registry](https://github.com/jdx/mise/blob/main/registry.toml) via PR
 
 ## Documentation
 
 - [Backend Plugin Development](https://mise.jdx.dev/backend-plugin-development.html) - Complete guide
 - [Backend Architecture](https://mise.jdx.dev/dev-tools/backend_architecture.html) - How backends work
 - [Lua modules reference](https://mise.jdx.dev/plugin-lua-modules.html) - Available modules
-- [mise-plugins organization](https://github.com/mise-plugins) - Community plugins
 
 ## License
 
